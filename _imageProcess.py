@@ -33,7 +33,3 @@ def image_harvester(item_url, class_tag, tag='img', link_source='src'):
 
     return list_of_image_links    
 
-'''
-https://harvestandmill.com/products/pants-black
-class="product__image"
-'''

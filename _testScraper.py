@@ -16,36 +16,44 @@ def page_content(url):
     return content
 
 
-content = page_content('https://harvestandmill.com/collections/menshop')
-soup = bs(content, 'html.parser')
-results = {}
-product_detail = {}
+def return_data():
+    content = page_content('https://harvestandmill.com/collections/menshop')
+    soup = bs(content, 'html.parser')
+    results = {}
+    data = {}
 
-for element in soup.find_all(attrs={'class':'product-details'}):    
-    link = element.find('a')
-    link = link.attrs['href']
-    results[element.find('h3').text] = f'https://harvestandmill.com{link}'
+    for element in soup.find_all(attrs={'class':'product-details'}):    
+        link = element.find('a')
+        link = link.attrs['href']
+        results[element.find('h3').text] = f'https://harvestandmill.com{link}'
 
 
-for prod_name, link in results.items():
-    item_page = page_content(link)
-    item_soup = bs(item_page, 'html.parser')
-    
-    short_desc = item_soup.find(attrs={'class': 'product__section-details__inner product__section-details__inner--product_description'}).find('p').text
-    sustainability_list = []
-    for impact in item_soup.find_all(attrs={'class': 'metric__value-box'}):
-        val=impact.find(attrs={'class': 'metric__value'}).text
-        unit=impact.find(attrs={'class': 'metric__unit'}).text
-        desc=impact.find(attrs={'class': 'metric__description'}).text
-        sustain_impact = val+' '+unit+' '+desc
-        sustainability_list.append(sustain_impact)
+    for prod_name, link in results.items():
+        item_page = page_content(link)
+        item_soup = bs(item_page, 'html.parser')
+        product_detail = {}
+        short_desc = item_soup.find(attrs={'class': 'product__section-details__inner product__section-details__inner--product_description'}).find('p').text
+        sustainability_list = []
+        for impact in item_soup.find_all(attrs={'class': 'metric__value-box'}):
+            val=impact.find(attrs={'class': 'metric__value'}).text
+            unit=impact.find(attrs={'class': 'metric__unit'}).text
+            desc=impact.find(attrs={'class': 'metric__description'}).text
+            sustain_impact = val+' '+unit+' '+desc
+            sustainability_list.append(sustain_impact)
 
-    product_detail["description"] = short_desc
-    product_detail["sustainability"] = sustainability_list
-    product_detail["image_gallery"] = image_harvester(link, 'product-media-container')
+        product_detail["description"] = short_desc
+        product_detail["sustainability"] = sustainability_list
+        product_detail["image_gallery"] = image_harvester(link, 'product-media-container')
 
-    break
+        data[prod_name] = product_detail
 
+    return data
+
+'''
+Create a dictionary of dictionary
+product name: product_detail
+Consider making into a dataframe
+'''
 #print(product_detail["description"])
 #print(product_detail["sustainability"])
 #print(product_detail["image_gallery"])
